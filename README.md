@@ -1,73 +1,144 @@
-# Welcome to your Lovable project
+# Romantic Countdown App with MongoDB Integration
 
-## Project info
+A beautiful countdown app for a romantic journey with MongoDB database integration to store user choices permanently.
 
-**URL**: https://lovable.dev/projects/0d8b6994-39d0-43fc-89f8-c4e850ee7d0e
+## Features
 
-## How can I edit this code?
+- **MongoDB Integration**: All user data is stored in MongoDB instead of localStorage
+- **Countdown Timer**: Countdown to August 2nd, 2025
+- **Interactive Cards**: Users can flip cards to make romantic choices
+- **Data Persistence**: Choices are saved to MongoDB database
+- **Data Reveal**: After countdown ends, all choices are displayed beautifully
+- **Admin Panel**: View all user choices with passcode protection
+- **Responsive Design**: Beautiful UI that works on all devices
 
-There are several ways of editing your application.
+## Database Setup
 
-**Use Lovable**
+The app uses MongoDB Atlas with the following connection string:
+```
+mongodb+srv://admin:Bx4wZ6SX4b6VTpJg@test-cluster.vrss4aa.mongodb.net/
+```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/0d8b6994-39d0-43fc-89f8-c4e850ee7d0e) and start prompting.
+### Collections Created:
+- **UserData**: Stores user choices and verification status
+  - `name`: User name (default: "Divu")
+  - `flippedCards`: Record of level numbers to selected card numbers
+  - `isLocked`: Boolean to prevent further changes
+  - `isVerified`: Boolean for name verification
+  - `createdAt`: Timestamp when data was first created
+  - `updatedAt`: Timestamp when data was last updated
 
-Changes made via Lovable will be committed automatically to this repo.
+## Installation
 
-**Use your preferred IDE**
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd six-month-surprise
+```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. Install dependencies:
+```bash
+npm install
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Running the Application
 
-Follow these steps:
+### Development Mode (Frontend + Backend)
+```bash
+npm run dev:full
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+This will start both the Express server (port 3001) and the Vite development server (port 8080).
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Development Mode (Frontend Only)
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Development Mode (Backend Only)
+```bash
+npm run dev:server
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Production Build
+```bash
+npm run build
+npm run build:server
+```
 
-**Use GitHub Codespaces**
+## API Endpoints
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- `GET /api/user-data` - Get user data from MongoDB
+- `POST /api/user-data` - Save user data to MongoDB
+- `POST /api/reset` - Reset user data
+- `GET /api/health` - Health check endpoint
 
-## What technologies are used for this project?
+## How It Works
 
-This project is built with:
+1. **Before August 2nd, 2025**:
+   - Users enter their name (must be "Divu")
+   - They can flip cards to make romantic choices
+   - All choices are saved to MongoDB in real-time
+   - Admin panel shows all choices with passcode protection
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+2. **After August 2nd, 2025**:
+   - The app automatically switches to reveal mode
+   - All stored choices are displayed beautifully
+   - Shows which cards were selected and what they contained
+   - Displays completion date and user information
 
-## How can I deploy this project?
+## Data Flow
 
-Simply open [Lovable](https://lovable.dev/projects/0d8b6994-39d0-43fc-89f8-c4e850ee7d0e) and click on Share -> Publish.
+1. **User Interaction** → React State Update
+2. **State Change** → API Call to Express Server
+3. **Express Server** → MongoDB Save Operation
+4. **Database** → Persistent Storage
+5. **On Load** → API Call to Fetch Data
+6. **Data Retrieved** → React State Update
 
-## Can I connect a custom domain to my Lovable project?
+## Fallback Mechanism
 
-Yes, you can!
+If the MongoDB server is unavailable:
+- The app falls back to localStorage
+- Users can still interact with the app
+- Data is preserved locally until server is available
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Admin Access
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- **Passcode**: `DiyuuuRohuuu`
+- **Access**: Click the "Answers" button in the bottom-right corner
+- **Features**: View all user choices, see progress through levels
+
+## Technologies Used
+
+- **Frontend**: React, TypeScript, Vite, Tailwind CSS, shadcn/ui
+- **Backend**: Express.js, Node.js
+- **Database**: MongoDB Atlas
+- **ORM**: Mongoose
+- **Development**: tsx, concurrently
+
+## Environment Variables
+
+Create a `.env` file in the root directory:
+```env
+PORT=3001
+MONGODB_URI=mongodb+srv://admin:Bx4wZ6SX4b6VTpJg@test-cluster.vrss4aa.mongodb.net/
+```
+
+## Deployment
+
+The app can be deployed to any platform that supports Node.js:
+
+1. **Frontend**: Deploy to Vercel, Netlify, or any static hosting
+2. **Backend**: Deploy to Railway, Heroku, or any Node.js hosting
+3. **Database**: MongoDB Atlas (already configured)
+
+## Security Notes
+
+- MongoDB connection string is included in the code for this specific project
+- In production, use environment variables for sensitive data
+- Admin passcode should be stored securely in production
+
+## Support
+
+For any issues or questions, please refer to the project documentation or contact the development team.

@@ -3,29 +3,71 @@ import CountdownHeader from '@/components/CountdownHeader';
 import LevelSection from '@/components/LevelSection';
 import AdminPanel from '@/components/AdminPanel';
 import NameVerification from '@/components/NameVerification';
+import DataReveal from '@/components/DataReveal';
 import { Button } from '@/components/ui/button';
 import { Lock, RotateCcw } from 'lucide-react';
+import { api } from '@/lib/api';
 
 const Index = () => {
   const [flippedCards, setFlippedCards] = useState<Record<string, number>>({});
   const [isVerified, setIsVerified] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<string>('');
 
-  // Load state from localStorage on component mount
+  // Load state from database on component mount
   useEffect(() => {
-    const savedState = localStorage.getItem('romantic-countdown-state');
-    if (savedState) {
-      const { flippedCards: saved, isLocked: savedLocked } = JSON.parse(savedState);
-      setFlippedCards(saved || {});
-      setIsLocked(savedLocked || false);
+    if (currentUser) {
+      const loadUserData = async () => {
+        try {
+          setIsLoading(true);
+          const userData = await api.getUserData(currentUser);
+          setFlippedCards(userData.flippedCards || {});
+          setIsLocked(userData.isLocked || false);
+          setIsVerified(userData.isVerified || false);
+        } catch (error) {
+          console.error('Error loading user data:', error);
+          // Fallback to localStorage if database is not available
+          const savedState = localStorage.getItem(`romantic-countdown-state-${currentUser}`);
+          if (savedState) {
+            const { flippedCards: saved, isLocked: savedLocked } = JSON.parse(savedState);
+            setFlippedCards(saved || {});
+            setIsLocked(savedLocked || false);
+          }
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      loadUserData();
+    } else {
+      // If no current user, stop loading and show name verification
+      setIsLoading(false);
     }
-  }, []);
+  }, [currentUser]);
 
-  // Save state to localStorage whenever it changes
+  // Save state to database whenever it changes
   useEffect(() => {
-    const state = { flippedCards, isLocked };
-    localStorage.setItem('romantic-countdown-state', JSON.stringify(state));
-  }, [flippedCards, isLocked]);
+    if (!isLoading && currentUser) {
+      const saveUserData = async () => {
+        try {
+          await api.saveUserData({
+            name: currentUser,
+            flippedCards,
+            isLocked,
+            isVerified
+          });
+        } catch (error) {
+          console.error('Error saving user data:', error);
+          // Fallback to localStorage if database is not available
+          const state = { flippedCards, isLocked };
+          localStorage.setItem(`romantic-countdown-state-${currentUser}`, JSON.stringify(state));
+        }
+      };
+
+      saveUserData();
+    }
+  }, [flippedCards, isLocked, isVerified, isLoading, currentUser]);
 
   const handleCardFlip = (level: number, card: number) => {
     // Only allow one card per level
@@ -35,7 +77,8 @@ const Index = () => {
     }));
   };
 
-  const handleVerification = () => {
+  const handleVerification = (userName: string) => {
+    setCurrentUser(userName);
     setIsVerified(true);
   };
 
@@ -43,11 +86,21 @@ const Index = () => {
     setIsLocked(true);
   };
 
-  const handleRefresh = () => {
-    setFlippedCards({});
-    setIsVerified(false);
-    setIsLocked(false);
-    localStorage.removeItem('romantic-countdown-state');
+  const handleRefresh = async () => {
+    try {
+      await api.resetUserData(currentUser);
+      setFlippedCards({});
+      setIsVerified(false);
+      setIsLocked(false);
+      localStorage.removeItem(`romantic-countdown-state-${currentUser}`);
+    } catch (error) {
+      console.error('Error resetting data:', error);
+      // Fallback to local reset
+      setFlippedCards({});
+      setIsVerified(false);
+      setIsLocked(false);
+      localStorage.removeItem(`romantic-countdown-state-${currentUser}`);
+    }
   };
 
   const levelData = [
@@ -93,8 +146,27 @@ const Index = () => {
     }
   ];
 
-  if (!isVerified) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your romantic journey...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if countdown has ended (1 minute from now for testing)
+  const isCountdownEnded = new Date() >= new Date(Date.now() + 60000);
+
+  if (!isVerified || !currentUser) {
     return <NameVerification onVerified={handleVerification} isLocked={isLocked} />;
+  }
+
+  // Show data reveal after countdown ends
+  if (isCountdownEnded) {
+    return <DataReveal flippedCards={flippedCards} currentUser={currentUser} />;
   }
 
   return (
@@ -114,8 +186,9 @@ const Index = () => {
           </Button>
           <Button
             onClick={handleRefresh}
+            disabled={isLocked}
             variant="outline"
-            className="border-primary/30 hover:bg-primary/10"
+            className="border-primary/30 hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Refresh

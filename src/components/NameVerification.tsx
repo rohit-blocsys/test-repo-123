@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Lock } from 'lucide-react';
 
 interface NameVerificationProps {
-  onVerified: () => void;
+  onVerified: (userName: string) => void;
   isLocked: boolean;
 }
 
@@ -15,11 +15,11 @@ const NameVerification = ({ onVerified, isLocked }: NameVerificationProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.toLowerCase() === 'divu') {
-      onVerified();
+    if (name.trim()) {
+      onVerified(name.trim());
       setError('');
     } else {
-      setError('Hmm, that\'s not the right name. Try again! 💕');
+      setError('Please enter your name to continue! 💕');
     }
   };
 

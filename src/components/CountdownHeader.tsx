@@ -10,7 +10,9 @@ const CountdownHeader = () => {
   });
 
   useEffect(() => {
-    const targetDate = new Date('2025-08-02T00:00:00');
+    // For testing: Set timer to 1 minute from now
+    const targetDate = new Date(Date.now() + 60000); // 1 minute from now
+    // const targetDate = new Date('2025-08-02T00:00:00'); // Original date
     
     const updateCountdown = () => {
       const now = new Date();
@@ -34,7 +36,8 @@ const CountdownHeader = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const isRevealed = new Date() >= new Date('2025-08-02T00:00:00');
+  const isRevealed = new Date() >= new Date(Date.now() + 60000);
+  // const isRevealed = new Date() >= new Date('2025-08-02T00:00:00'); // Original
 
   return (
     <div className="text-center mb-12">
