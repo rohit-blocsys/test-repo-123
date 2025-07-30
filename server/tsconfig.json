@@ -16,7 +16,8 @@
   },
   "include": [
     "**/*",
-    "../src/lib/database.ts"
+    "../src/lib/database.ts",
+    "./database.ts"
   ],
   "exclude": [
     "node_modules",

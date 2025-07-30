@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { config } from 'dotenv';
-import { connectDB, saveUserData, getUserData, getAllUsersData, resetUserData } from '../src/lib/database';
+import { connectDB, saveUserData, getUserData, getAllUsersData, resetUserData } from './database';
 
 // Load environment variables
 config();
