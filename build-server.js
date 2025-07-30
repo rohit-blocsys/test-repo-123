@@ -32,6 +32,14 @@ if (fs.existsSync(databaseJsSource)) {
   console.log('Copied compiled database.js to dist directory');
 }
 
+// Install TypeScript if not present
+try {
+  execSync('npm install typescript --save-dev', { stdio: 'inherit' });
+  console.log('✅ TypeScript installed');
+} catch (error) {
+  console.log('TypeScript already installed or failed to install');
+}
+
 // Compile TypeScript
 try {
   execSync('npx tsc -p server/tsconfig.json', { stdio: 'inherit' });
