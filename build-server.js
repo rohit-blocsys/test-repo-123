@@ -40,9 +40,9 @@ try {
   console.log('TypeScript already installed or failed to install');
 }
 
-// Compile TypeScript
+// Compile TypeScript using local installation
 try {
-  execSync('npx tsc -p server/tsconfig.json', { stdio: 'inherit' });
+  execSync('./node_modules/.bin/tsc -p server/tsconfig.json', { stdio: 'inherit' });
   console.log('✅ Server built successfully');
 } catch (error) {
   console.error('❌ Server build failed:', error.message);
