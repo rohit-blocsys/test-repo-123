@@ -11,7 +11,7 @@ const Timer = ({ lockedAt, onTimeUp }: TimerProps) => {
     hours: number;
     minutes: number;
     seconds: number;
-  }>({ hours: 1, minutes: 0, seconds: 0 });
+  }>({ hours: 0, minutes: 1, seconds: 0 });
 
   useEffect(() => {
     const calculateTimeLeft = () => {
