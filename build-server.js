@@ -32,17 +32,12 @@ if (fs.existsSync(databaseJsSource)) {
   console.log('Copied compiled database.js to dist directory');
 }
 
-// Install TypeScript in server directory if not present
-try {
-  execSync('cd server && npm install typescript --save-dev', { stdio: 'inherit' });
-  console.log('✅ TypeScript installed in server directory');
-} catch (error) {
-  console.log('TypeScript already installed or failed to install in server directory');
-}
+// TypeScript is already installed in root directory
+console.log('✅ Using TypeScript from root directory');
 
-// Compile TypeScript using server directory's tsc
+// Compile TypeScript using root directory's tsc
 try {
-  execSync('cd server && npx tsc -p tsconfig.json', { stdio: 'inherit' });
+  execSync('./node_modules/.bin/tsc -p server/tsconfig.json', { stdio: 'inherit' });
   console.log('✅ Server built successfully');
 } catch (error) {
   console.error('❌ Server build failed:', error.message);
