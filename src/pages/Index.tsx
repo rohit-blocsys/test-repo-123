@@ -113,7 +113,7 @@ const Index = () => {
   };
 
   const handleTimeUp = () => {
-    console.log('⏰ 1 hour timer ended, user can now see results');
+    console.log('⏰ 1 minute timer ended, user can now see results');
     setHasSeenResults(true);
   };
 
@@ -191,8 +191,8 @@ const Index = () => {
   // Check if countdown has ended (August 2nd, 2025)
   const isCountdownEnded = new Date() >= new Date('2025-08-02T00:00:00Z');
   
-  // Check if 1 hour has passed since locking
-  const isOneHourPassed = lockedAt && new Date() >= new Date(lockedAt.getTime() + 60 * 60 * 1000);
+  // Check if 1 minute has passed since locking (for testing)
+  const isOneHourPassed = lockedAt && new Date() >= new Date(lockedAt.getTime() + 60 * 1000);
   
   // Check if user should see results (either countdown ended or 1 hour passed and they've seen results)
   const shouldShowResults = isCountdownEnded || (isOneHourPassed && hasSeenResults);

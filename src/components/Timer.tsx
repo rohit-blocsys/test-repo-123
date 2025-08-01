@@ -16,7 +16,7 @@ const Timer = ({ lockedAt, onTimeUp }: TimerProps) => {
   useEffect(() => {
     const calculateTimeLeft = () => {
       const now = new Date().getTime();
-      const targetTime = new Date(lockedAt.getTime() + 60 * 60 * 1000).getTime(); // 1 hour
+      const targetTime = new Date(lockedAt.getTime() + 60 * 1000).getTime(); // 1 minute for testing
       const difference = targetTime - now;
 
       if (difference <= 0) {
