@@ -64,17 +64,44 @@ const saveUserData = async (data) => {
   try {
     console.log('💾 Attempting to save user data:', data);
     
+    // Convert flippedCards object to Map for MongoDB
+    const flippedCardsMap = new Map();
+    if (data.flippedCards && typeof data.flippedCards === 'object') {
+      Object.entries(data.flippedCards).forEach(([key, value]) => {
+        flippedCardsMap.set(key, value);
+      });
+    }
+    
     const userData = await UserData.findOneAndUpdate(
       { name: data.name },
       {
-        ...data,
+        name: data.name,
+        flippedCards: flippedCardsMap,
+        isLocked: data.isLocked,
+        isVerified: data.isVerified,
         updatedAt: new Date()
       },
       { upsert: true, new: true }
     );
     
     console.log('✅ User data saved successfully:', userData);
-    return userData;
+    
+    // Convert back to plain object for response
+    const flippedCardsObj = {};
+    if (userData.flippedCards && userData.flippedCards instanceof Map) {
+      userData.flippedCards.forEach((value, key) => {
+        flippedCardsObj[key] = value;
+      });
+    }
+    
+    return {
+      name: userData.name,
+      flippedCards: flippedCardsObj,
+      isLocked: userData.isLocked,
+      isVerified: userData.isVerified,
+      createdAt: userData.createdAt,
+      updatedAt: userData.updatedAt
+    };
   } catch (error) {
     console.error('❌ Error saving user data:', error);
     console.error('❌ Error details:', error.message);
@@ -86,7 +113,26 @@ const saveUserData = async (data) => {
 const getUserData = async (name) => {
   try {
     const userData = await UserData.findOne({ name });
-    return userData || {
+    if (userData) {
+      // Convert Map to plain object for JSON serialization
+      const flippedCardsObj = {};
+      if (userData.flippedCards && userData.flippedCards instanceof Map) {
+        userData.flippedCards.forEach((value, key) => {
+          flippedCardsObj[key] = value;
+        });
+      }
+      
+      return {
+        name: userData.name,
+        flippedCards: flippedCardsObj,
+        isLocked: userData.isLocked,
+        isVerified: userData.isVerified,
+        createdAt: userData.createdAt,
+        updatedAt: userData.updatedAt
+      };
+    }
+    
+    return {
       name,
       flippedCards: {},
       isLocked: false,
