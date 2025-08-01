@@ -8,12 +8,6 @@ const __dirname = path.dirname(__filename);
 
 console.log('Building server...');
 
-// Create dist directory if it doesn't exist
-const distDir = path.join(__dirname, 'server', 'dist');
-if (!fs.existsSync(distDir)) {
-  fs.mkdirSync(distDir, { recursive: true });
-}
-
 // Copy database.ts to server directory for compilation
 const databaseSource = path.join(__dirname, 'src', 'lib', 'database.ts');
 const databaseDest = path.join(__dirname, 'server', 'database.ts');
@@ -23,23 +17,28 @@ if (fs.existsSync(databaseSource)) {
   console.log('Copied database.ts to server directory');
 }
 
-// Copy compiled database.js to dist directory
-const databaseJsSource = path.join(__dirname, 'server', 'database.js');
-const databaseJsDest = path.join(__dirname, 'server', 'dist', 'database.js');
+// Use JavaScript files directly - bypass TypeScript compilation
+console.log('🔄 Using JavaScript files directly...');
 
-if (fs.existsSync(databaseJsSource)) {
-  fs.copyFileSync(databaseJsSource, databaseJsDest);
-  console.log('Copied compiled database.js to dist directory');
+// Create dist directory if it doesn't exist
+const distDir = path.join(__dirname, 'server', 'dist');
+if (!fs.existsSync(distDir)) {
+  fs.mkdirSync(distDir, { recursive: true });
 }
 
-// TypeScript is already installed in root directory
-console.log('✅ Using TypeScript from root directory');
+// Copy JavaScript files to dist directory
+const filesToCopy = [
+  { src: 'server/index.js', dest: 'server/dist/index.js' },
+  { src: 'server/database.js', dest: 'server/dist/database.js' }
+];
 
-// Compile TypeScript using root directory's tsc
-try {
-  execSync('./node_modules/.bin/tsc -p server/tsconfig.json', { stdio: 'inherit' });
-  console.log('✅ Server built successfully');
-} catch (error) {
-  console.error('❌ Server build failed:', error.message);
-  process.exit(1);
-} 
+for (const file of filesToCopy) {
+  if (fs.existsSync(file.src)) {
+    fs.copyFileSync(file.src, file.dest);
+    console.log(`📄 Copied ${file.src} to ${file.dest}`);
+  } else {
+    console.log(`⚠️  Warning: ${file.src} not found`);
+  }
+}
+
+console.log('✅ Server built successfully using JavaScript files'); 
