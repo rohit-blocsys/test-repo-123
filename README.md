@@ -2,6 +2,8 @@
 
 A beautiful countdown app for a romantic journey with MongoDB database integration to store user choices permanently.
 
+<!-- Deployment trigger: Updated on $(date) -->
+
 ## Features
 
 - **MongoDB Integration**: All user data is stored in MongoDB instead of localStorage
