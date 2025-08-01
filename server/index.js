@@ -77,10 +77,10 @@ app.post('/api/user-data', async (req, res) => {
       });
     }
     
-    const { name, flippedCards, isLocked, isVerified } = req.body;
-    console.log(`💾 Saving user data for: ${name}`, { flippedCards, isLocked, isVerified });
+    const { name, flippedCards, selectedStatements, isLocked, isVerified, hasSeenResults } = req.body;
+    console.log(`💾 Saving user data for: ${name}`, { flippedCards, selectedStatements, isLocked, isVerified, hasSeenResults });
     
-    const userData = await saveUserData({ name, flippedCards, isLocked, isVerified });
+    const userData = await saveUserData({ name, flippedCards, selectedStatements, isLocked, isVerified, hasSeenResults });
     console.log(`✅ User data saved successfully:`, userData);
     res.json(userData);
   } catch (error) {
