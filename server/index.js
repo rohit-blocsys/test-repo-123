@@ -69,12 +69,27 @@ app.get('/api/all-users', async (req, res) => {
 
 app.post('/api/user-data', async (req, res) => {
   try {
+    if (!dbConnected) {
+      console.log('⚠️ Database not connected, cannot save user data');
+      return res.status(503).json({ 
+        error: 'Database not connected',
+        message: 'Server is temporarily unavailable'
+      });
+    }
+    
     const { name, flippedCards, isLocked, isVerified } = req.body;
+    console.log(`💾 Saving user data for: ${name}`, { flippedCards, isLocked, isVerified });
+    
     const userData = await saveUserData({ name, flippedCards, isLocked, isVerified });
+    console.log(`✅ User data saved successfully:`, userData);
     res.json(userData);
   } catch (error) {
-    console.error('Error saving user data:', error);
-    res.status(500).json({ error: 'Failed to save user data' });
+    console.error('❌ Error saving user data:', error);
+    res.status(500).json({ 
+      error: 'Failed to save user data',
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 

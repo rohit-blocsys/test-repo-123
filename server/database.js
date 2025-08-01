@@ -45,10 +45,16 @@ const UserData = mongoose.model('UserData', userDataSchema);
 // Database connection function
 const connectDB = async () => {
   try {
-    await mongoose.connect(MONGODB_URI);
-    console.log('MongoDB connected successfully');
+    console.log('🔌 Attempting to connect to MongoDB...');
+    console.log('📡 Connection string:', MONGODB_URI.replace(/\/\/[^:]+:[^@]+@/, '//***:***@'));
+    
+    await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('✅ MongoDB connected successfully');
   } catch (error) {
-    console.error('MongoDB connection error:', error);
+    console.error('❌ MongoDB connection error:', error);
     throw error;
   }
 };
@@ -56,6 +62,8 @@ const connectDB = async () => {
 // Database operations
 const saveUserData = async (data) => {
   try {
+    console.log('💾 Attempting to save user data:', data);
+    
     const userData = await UserData.findOneAndUpdate(
       { name: data.name },
       {
@@ -64,9 +72,13 @@ const saveUserData = async (data) => {
       },
       { upsert: true, new: true }
     );
+    
+    console.log('✅ User data saved successfully:', userData);
     return userData;
   } catch (error) {
-    console.error('Error saving user data:', error);
+    console.error('❌ Error saving user data:', error);
+    console.error('❌ Error details:', error.message);
+    console.error('❌ Error stack:', error.stack);
     throw error;
   }
 };
