@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 interface TimerProps {
   lockedAt: Date;
@@ -21,6 +22,30 @@ const Timer = ({ lockedAt, onTimeUp }: TimerProps) => {
 
       if (difference <= 0) {
         setTimeLeft({ hours: 0, minutes: 0, seconds: 0 });
+        
+        // Trigger celebration confetti!
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+        
+        // Additional burst of confetti
+        setTimeout(() => {
+          confetti({
+            particleCount: 50,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 }
+          });
+          confetti({
+            particleCount: 50,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 }
+          });
+        }, 250);
+        
         onTimeUp();
         return;
       }

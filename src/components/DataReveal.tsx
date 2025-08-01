@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Calendar, Clock, User } from 'lucide-react';
 import { api, UserData } from '@/lib/api';
+import confetti from 'canvas-confetti';
 
 interface DataRevealProps {
   flippedCards: Record<string, number>;
@@ -19,6 +20,32 @@ const DataReveal = ({ flippedCards, selectedStatements, currentUser }: DataRevea
         setIsLoading(true);
         const data = await api.getUserData(currentUser);
         setUserData(data);
+        
+        // Trigger celebration confetti when results are shown!
+        setTimeout(() => {
+          confetti({
+            particleCount: 150,
+            spread: 90,
+            origin: { y: 0.6 }
+          });
+          
+          // Additional bursts
+          setTimeout(() => {
+            confetti({
+              particleCount: 75,
+              angle: 60,
+              spread: 55,
+              origin: { x: 0 }
+            });
+            confetti({
+              particleCount: 75,
+              angle: 120,
+              spread: 55,
+              origin: { x: 1 }
+            });
+          }, 300);
+        }, 500); // Small delay to let the component render first
+        
       } catch (error) {
         console.error('Error loading user data for reveal:', error);
       } finally {
