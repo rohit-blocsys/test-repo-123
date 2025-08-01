@@ -3,6 +3,7 @@
 A beautiful countdown app for a romantic journey with MongoDB database integration to store user choices permanently.
 
 <!-- Deployment trigger: Updated on $(date) -->
+<!-- Triggering deployment with JavaScript build approach -->
 
 ## Features
 
