@@ -21,10 +21,16 @@ const Index = () => {
       const loadUserData = async () => {
         try {
           setIsLoading(true);
+          console.log('🔄 Loading user data for:', currentUser);
           const userData = await api.getUserData(currentUser);
+          console.log('📊 User data loaded:', userData);
           setFlippedCards(userData.flippedCards || {});
           setIsLocked(userData.isLocked || false);
-          setIsVerified(userData.isVerified || false);
+          // Only set isVerified from database if it's true, don't override if user just verified
+          if (userData.isVerified) {
+            console.log('✅ Setting isVerified to true from database');
+            setIsVerified(true);
+          }
         } catch (error) {
           console.error('Error loading user data:', error);
           // Fallback to localStorage if database is not available
@@ -78,8 +84,10 @@ const Index = () => {
   };
 
   const handleVerification = (userName: string) => {
+    console.log('🔐 User verified:', userName);
     setCurrentUser(userName);
     setIsVerified(true);
+    setIsLoading(false); // Ensure loading stops immediately
   };
 
   const handleLock = () => {
@@ -160,7 +168,10 @@ const Index = () => {
   // Check if countdown has ended (August 2nd, 2025)
   const isCountdownEnded = new Date() >= new Date('2025-08-02T00:00:00Z');
 
+  console.log('🔍 Render state:', { currentUser, isVerified, isLoading, isLocked });
+  
   if (!isVerified || !currentUser) {
+    console.log('📝 Showing name verification form');
     return <NameVerification onVerified={handleVerification} isLocked={isLocked} />;
   }
 
