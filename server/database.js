@@ -16,8 +16,7 @@ const userDataSchema = new mongoose.Schema({
     default: {}
   },
   selectedStatements: {
-    type: Map,
-    of: String,
+    type: Object,
     default: {}
   },
   isLocked: {
@@ -85,26 +84,17 @@ const saveUserData = async (data) => {
       });
     }
     
-    // Convert selectedStatements object to Map for MongoDB
-    const selectedStatementsMap = new Map();
-    if (data.selectedStatements && typeof data.selectedStatements === 'object') {
-      Object.entries(data.selectedStatements).forEach(([key, value]) => {
-        selectedStatementsMap.set(key, value);
-      });
-    }
+    // selectedStatements as plain object
+    const selectedStatementsObj = data.selectedStatements || {};
     
     const updateData = {
       name: data.name,
       flippedCards: flippedCardsMap,
+      selectedStatements: selectedStatementsObj,
       isLocked: data.isLocked,
       isVerified: data.isVerified,
       updatedAt: new Date()
     };
-    
-    // Add selectedStatements if provided
-    if (data.selectedStatements) {
-      updateData.selectedStatements = selectedStatementsMap;
-    }
     
     // Set lockedAt timestamp when locking
     if (data.isLocked && !data.wasLocked) {
@@ -123,6 +113,7 @@ const saveUserData = async (data) => {
     );
     
     console.log('✅ User data saved successfully:', userData);
+    console.log('📊 Selected statements in saved data:', userData.selectedStatements);
     
     // Convert back to plain object for response
     const flippedCardsObj = {};
@@ -132,24 +123,24 @@ const saveUserData = async (data) => {
       });
     }
     
-    const selectedStatementsObj = {};
-    if (userData.selectedStatements && userData.selectedStatements instanceof Map) {
-      userData.selectedStatements.forEach((value, key) => {
-        selectedStatementsObj[key] = value;
-      });
-    }
+    // selectedStatements is already a plain object
+    const selectedStatementsResponse = userData.selectedStatements || {};
+    console.log('📊 Selected statements from DB:', selectedStatementsResponse);
     
-    return {
-      name: userData.name,
-      flippedCards: flippedCardsObj,
-      selectedStatements: selectedStatementsObj,
-      isLocked: userData.isLocked,
-      isVerified: userData.isVerified,
-      hasSeenResults: userData.hasSeenResults,
-      lockedAt: userData.lockedAt,
-      createdAt: userData.createdAt,
-      updatedAt: userData.updatedAt
-    };
+          const response = {
+        name: userData.name,
+        flippedCards: flippedCardsObj,
+        selectedStatements: selectedStatementsResponse,
+        isLocked: userData.isLocked,
+        isVerified: userData.isVerified,
+        hasSeenResults: userData.hasSeenResults,
+        lockedAt: userData.lockedAt,
+        createdAt: userData.createdAt,
+        updatedAt: userData.updatedAt
+      };
+    
+    console.log('📤 Response data:', response);
+    return response;
   } catch (error) {
     console.error('❌ Error saving user data:', error);
     console.error('❌ Error details:', error.message);
@@ -160,7 +151,10 @@ const saveUserData = async (data) => {
 
 const getUserData = async (name) => {
   try {
+    console.log('🔍 Getting user data for:', name);
     const userData = await UserData.findOne({ name });
+    console.log('📊 Raw user data from DB:', userData);
+    
     if (userData) {
       // Convert Map to plain object for JSON serialization
       const flippedCardsObj = {};
@@ -170,17 +164,13 @@ const getUserData = async (name) => {
         });
       }
       
-      const selectedStatementsObj = {};
-      if (userData.selectedStatements && userData.selectedStatements instanceof Map) {
-        userData.selectedStatements.forEach((value, key) => {
-          selectedStatementsObj[key] = value;
-        });
-      }
+      // selectedStatements is already a plain object
+      const selectedStatementsResponse = userData.selectedStatements || {};
       
-      return {
+      const response = {
         name: userData.name,
         flippedCards: flippedCardsObj,
-        selectedStatements: selectedStatementsObj,
+        selectedStatements: selectedStatementsResponse,
         isLocked: userData.isLocked,
         isVerified: userData.isVerified,
         hasSeenResults: userData.hasSeenResults,
@@ -188,6 +178,9 @@ const getUserData = async (name) => {
         createdAt: userData.createdAt,
         updatedAt: userData.updatedAt
       };
+      
+      console.log('📤 getUserData response:', response);
+      return response;
     }
     
     return {
