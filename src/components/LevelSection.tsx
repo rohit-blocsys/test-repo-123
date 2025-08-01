@@ -5,15 +5,15 @@ interface LevelSectionProps {
   level: number;
   title: string;
   cards: string[];
-  onCardFlip: (level: number, card: number) => void;
+  onCardFlip: (level: number, card: number, statement: string) => void;
   selectedCard?: number;
 }
 
 const LevelSection = ({ level, title, cards, onCardFlip, selectedCard }: LevelSectionProps) => {
-  const handleCardFlip = (cardNumber: number) => {
+  const handleCardFlip = (cardNumber: number, statement: string) => {
     // Only allow flipping if no card is selected yet for this level
     if (selectedCard === undefined) {
-      onCardFlip(level, cardNumber);
+      onCardFlip(level, cardNumber, statement);
     }
   };
 
@@ -44,7 +44,7 @@ const LevelSection = ({ level, title, cards, onCardFlip, selectedCard }: LevelSe
             key={`${level}-${index + 1}`}
             number={index + 1}
             content={content}
-            onFlip={() => handleCardFlip(index + 1)}
+            onFlip={() => handleCardFlip(index + 1, content)}
             isFlipped={selectedCard === index + 1}
             isDisabled={selectedCard !== undefined && selectedCard !== index + 1}
           />

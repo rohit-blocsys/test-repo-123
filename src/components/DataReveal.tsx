@@ -5,10 +5,11 @@ import { api, UserData } from '@/lib/api';
 
 interface DataRevealProps {
   flippedCards: Record<string, number>;
+  selectedStatements: Record<string, string>;
   currentUser: string;
 }
 
-const DataReveal = ({ flippedCards, currentUser }: DataRevealProps) => {
+const DataReveal = ({ flippedCards, selectedStatements, currentUser }: DataRevealProps) => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -122,7 +123,7 @@ const DataReveal = ({ flippedCards, currentUser }: DataRevealProps) => {
         <div className="space-y-8">
           {levelData.map((data) => {
             const selectedCard = flippedCards[data.level];
-            const selectedContent = selectedCard ? data.cards[selectedCard - 1] : null;
+            const selectedContent = selectedStatements[data.level] || (selectedCard ? data.cards[selectedCard - 1] : null);
 
             return (
               <Card key={data.level} className="bg-gradient-card border-primary/20 shadow-romantic">

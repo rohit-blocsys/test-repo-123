@@ -4,14 +4,18 @@ import LevelSection from '@/components/LevelSection';
 import AdminPanel from '@/components/AdminPanel';
 import NameVerification from '@/components/NameVerification';
 import DataReveal from '@/components/DataReveal';
+import Timer from '@/components/Timer';
 import { Button } from '@/components/ui/button';
 import { Lock, RotateCcw } from 'lucide-react';
 import { api } from '@/lib/api';
 
 const Index = () => {
   const [flippedCards, setFlippedCards] = useState<Record<string, number>>({});
+  const [selectedStatements, setSelectedStatements] = useState<Record<string, string>>({});
   const [isVerified, setIsVerified] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
+  const [hasSeenResults, setHasSeenResults] = useState(false);
+  const [lockedAt, setLockedAt] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<string>('');
 
@@ -25,7 +29,10 @@ const Index = () => {
           const userData = await api.getUserData(currentUser);
           console.log('📊 User data loaded:', userData);
           setFlippedCards(userData.flippedCards || {});
+          setSelectedStatements(userData.selectedStatements || {});
           setIsLocked(userData.isLocked || false);
+          setHasSeenResults(userData.hasSeenResults || false);
+          setLockedAt(userData.lockedAt ? new Date(userData.lockedAt) : null);
           // Only set isVerified from database if it's true, don't override if user just verified
           if (userData.isVerified) {
             console.log('✅ Setting isVerified to true from database');
@@ -60,26 +67,34 @@ const Index = () => {
           await api.saveUserData({
             name: currentUser,
             flippedCards,
+            selectedStatements,
             isLocked,
-            isVerified
+            isVerified,
+            hasSeenResults
           });
         } catch (error) {
           console.error('Error saving user data:', error);
           // Fallback to localStorage if database is not available
-          const state = { flippedCards, isLocked };
+          const state = { flippedCards, selectedStatements, isLocked, hasSeenResults };
           localStorage.setItem(`romantic-countdown-state-${currentUser}`, JSON.stringify(state));
         }
       };
 
       saveUserData();
     }
-  }, [flippedCards, isLocked, isVerified, isLoading, currentUser]);
+  }, [flippedCards, selectedStatements, isLocked, isVerified, hasSeenResults, isLoading, currentUser]);
 
-  const handleCardFlip = (level: number, card: number) => {
+  const handleCardFlip = (level: number, card: number, statement: string) => {
     // Only allow one card per level
     setFlippedCards(prev => ({
       ...prev,
       [level]: card
+    }));
+    
+    // Store the selected statement
+    setSelectedStatements(prev => ({
+      ...prev,
+      [level]: statement
     }));
   };
 
@@ -91,7 +106,15 @@ const Index = () => {
   };
 
   const handleLock = () => {
+    const now = new Date();
     setIsLocked(true);
+    setLockedAt(now);
+    console.log('🔒 User locked their choices at:', now);
+  };
+
+  const handleTimeUp = () => {
+    console.log('⏰ 1 hour timer ended, user can now see results');
+    setHasSeenResults(true);
   };
 
   const handleRefresh = async () => {
@@ -167,23 +190,34 @@ const Index = () => {
 
   // Check if countdown has ended (August 2nd, 2025)
   const isCountdownEnded = new Date() >= new Date('2025-08-02T00:00:00Z');
+  
+  // Check if 1 hour has passed since locking
+  const isOneHourPassed = lockedAt && new Date() >= new Date(lockedAt.getTime() + 60 * 60 * 1000);
+  
+  // Check if user should see results (either countdown ended or 1 hour passed and they've seen results)
+  const shouldShowResults = isCountdownEnded || (isOneHourPassed && hasSeenResults);
 
-  console.log('🔍 Render state:', { currentUser, isVerified, isLoading, isLocked });
+  console.log('🔍 Render state:', { currentUser, isVerified, isLoading, isLocked, lockedAt, isOneHourPassed, hasSeenResults });
   
   if (!isVerified || !currentUser) {
     console.log('📝 Showing name verification form');
     return <NameVerification onVerified={handleVerification} isLocked={isLocked} />;
   }
 
-  // Show data reveal after countdown ends
-  if (isCountdownEnded) {
-    return <DataReveal flippedCards={flippedCards} currentUser={currentUser} />;
+  // Show data reveal after countdown ends or 1 hour passed
+  if (shouldShowResults) {
+    return <DataReveal flippedCards={flippedCards} selectedStatements={selectedStatements} currentUser={currentUser} />;
   }
 
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-6xl mx-auto">
         <CountdownHeader />
+        
+        {/* Show timer if locked */}
+        {isLocked && lockedAt && !isOneHourPassed && (
+          <Timer lockedAt={lockedAt} onTimeUp={handleTimeUp} />
+        )}
         
         {/* Control buttons */}
         <div className="flex justify-center gap-4 mb-8">
@@ -219,7 +253,7 @@ const Index = () => {
           ))}
         </div>
         
-        <AdminPanel flippedCards={flippedCards} />
+        <AdminPanel flippedCards={flippedCards} selectedStatements={selectedStatements} />
       </div>
     </div>
   );

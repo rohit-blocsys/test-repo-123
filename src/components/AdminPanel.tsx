@@ -8,9 +8,10 @@ import { api, UserData } from '@/lib/api';
 
 interface AdminPanelProps {
   flippedCards: Record<string, number>;
+  selectedStatements: Record<string, string>;
 }
 
-const AdminPanel = ({ flippedCards }: AdminPanelProps) => {
+const AdminPanel = ({ flippedCards, selectedStatements }: AdminPanelProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [passcode, setPasscode] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -135,28 +136,36 @@ const AdminPanel = ({ flippedCards }: AdminPanelProps) => {
                       <div className="grid gap-3">
                         {[1, 2, 3, 4].map(level => {
                           const selectedCard = user.flippedCards[level];
+                          const selectedStatement = user.selectedStatements?.[level];
                           return (
-                            <div key={level} className="flex items-center justify-between p-2 bg-muted/30 rounded">
-                              <span className="text-sm">
-                                Level {level}: {levelTitles[level as keyof typeof levelTitles]}
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-muted-foreground">
-                                  {selectedCard ? `Card ${selectedCard}` : 'Not selected'}
+                            <div key={level} className="space-y-2 p-2 bg-muted/30 rounded">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium">
+                                  Level {level}: {levelTitles[level as keyof typeof levelTitles]}
                                 </span>
-                                <div className="flex gap-1">
-                                  {[1, 2, 3, 4].map(cardNum => (
-                                    <div
-                                      key={cardNum}
-                                      className={`w-3 h-3 rounded-full border ${
-                                        selectedCard === cardNum
-                                          ? 'bg-primary border-primary'
-                                          : 'border-muted-foreground/30'
-                                      }`}
-                                    />
-                                  ))}
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-muted-foreground">
+                                    {selectedCard ? `Card ${selectedCard}` : 'Not selected'}
+                                  </span>
+                                  <div className="flex gap-1">
+                                    {[1, 2, 3, 4].map(cardNum => (
+                                      <div
+                                        key={cardNum}
+                                        className={`w-3 h-3 rounded-full border ${
+                                          selectedCard === cardNum
+                                            ? 'bg-primary border-primary'
+                                            : 'border-muted-foreground/30'
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
                                 </div>
                               </div>
+                              {selectedStatement && (
+                                <div className="text-xs text-muted-foreground bg-primary/10 p-2 rounded">
+                                  <strong>Selected:</strong> {selectedStatement}
+                                </div>
+                              )}
                             </div>
                           );
                         })}

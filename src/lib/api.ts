@@ -5,8 +5,11 @@ const API_BASE_URL = process.env.NODE_ENV === 'production'
 export interface UserData {
   name: string;
   flippedCards: Record<string, number>;
+  selectedStatements: Record<string, string>;
   isLocked: boolean;
   isVerified: boolean;
+  hasSeenResults: boolean;
+  lockedAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -26,8 +29,10 @@ export const api = {
       return {
         name,
         flippedCards: {},
+        selectedStatements: {},
         isLocked: false,
-        isVerified: false
+        isVerified: false,
+        hasSeenResults: false
       };
     }
   },
@@ -50,8 +55,11 @@ export const api = {
   async saveUserData(data: {
     name: string;
     flippedCards: Record<string, number>;
+    selectedStatements?: Record<string, string>;
     isLocked: boolean;
     isVerified: boolean;
+    hasSeenResults?: boolean;
+    wasLocked?: boolean;
   }): Promise<UserData> {
     try {
       const response = await fetch(`${API_BASE_URL}/user-data`, {

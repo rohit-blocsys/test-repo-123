@@ -15,6 +15,11 @@ const userDataSchema = new mongoose.Schema({
     of: Number,
     default: {}
   },
+  selectedStatements: {
+    type: Map,
+    of: String,
+    default: {}
+  },
   isLocked: {
     type: Boolean,
     default: false
@@ -22,6 +27,14 @@ const userDataSchema = new mongoose.Schema({
   isVerified: {
     type: Boolean,
     default: false
+  },
+  hasSeenResults: {
+    type: Boolean,
+    default: false
+  },
+  lockedAt: {
+    type: Date,
+    default: null
   },
   createdAt: {
     type: Date,
@@ -72,15 +85,40 @@ const saveUserData = async (data) => {
       });
     }
     
+    // Convert selectedStatements object to Map for MongoDB
+    const selectedStatementsMap = new Map();
+    if (data.selectedStatements && typeof data.selectedStatements === 'object') {
+      Object.entries(data.selectedStatements).forEach(([key, value]) => {
+        selectedStatementsMap.set(key, value);
+      });
+    }
+    
+    const updateData = {
+      name: data.name,
+      flippedCards: flippedCardsMap,
+      isLocked: data.isLocked,
+      isVerified: data.isVerified,
+      updatedAt: new Date()
+    };
+    
+    // Add selectedStatements if provided
+    if (data.selectedStatements) {
+      updateData.selectedStatements = selectedStatementsMap;
+    }
+    
+    // Set lockedAt timestamp when locking
+    if (data.isLocked && !data.wasLocked) {
+      updateData.lockedAt = new Date();
+    }
+    
+    // Add hasSeenResults if provided
+    if (data.hasSeenResults !== undefined) {
+      updateData.hasSeenResults = data.hasSeenResults;
+    }
+    
     const userData = await UserData.findOneAndUpdate(
       { name: data.name },
-      {
-        name: data.name,
-        flippedCards: flippedCardsMap,
-        isLocked: data.isLocked,
-        isVerified: data.isVerified,
-        updatedAt: new Date()
-      },
+      updateData,
       { upsert: true, new: true }
     );
     
@@ -94,11 +132,21 @@ const saveUserData = async (data) => {
       });
     }
     
+    const selectedStatementsObj = {};
+    if (userData.selectedStatements && userData.selectedStatements instanceof Map) {
+      userData.selectedStatements.forEach((value, key) => {
+        selectedStatementsObj[key] = value;
+      });
+    }
+    
     return {
       name: userData.name,
       flippedCards: flippedCardsObj,
+      selectedStatements: selectedStatementsObj,
       isLocked: userData.isLocked,
       isVerified: userData.isVerified,
+      hasSeenResults: userData.hasSeenResults,
+      lockedAt: userData.lockedAt,
       createdAt: userData.createdAt,
       updatedAt: userData.updatedAt
     };
@@ -122,11 +170,21 @@ const getUserData = async (name) => {
         });
       }
       
+      const selectedStatementsObj = {};
+      if (userData.selectedStatements && userData.selectedStatements instanceof Map) {
+        userData.selectedStatements.forEach((value, key) => {
+          selectedStatementsObj[key] = value;
+        });
+      }
+      
       return {
         name: userData.name,
         flippedCards: flippedCardsObj,
+        selectedStatements: selectedStatementsObj,
         isLocked: userData.isLocked,
         isVerified: userData.isVerified,
+        hasSeenResults: userData.hasSeenResults,
+        lockedAt: userData.lockedAt,
         createdAt: userData.createdAt,
         updatedAt: userData.updatedAt
       };
@@ -135,8 +193,11 @@ const getUserData = async (name) => {
     return {
       name,
       flippedCards: {},
+      selectedStatements: {},
       isLocked: false,
-      isVerified: false
+      isVerified: false,
+      hasSeenResults: false,
+      lockedAt: null
     };
   } catch (error) {
     console.error('Error getting user data:', error);
