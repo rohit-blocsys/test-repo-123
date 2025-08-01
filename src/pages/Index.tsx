@@ -157,8 +157,8 @@ const Index = () => {
     );
   }
 
-  // Check if countdown has ended (1 minute from now for testing)
-  const isCountdownEnded = new Date() >= new Date(Date.now() + 60000);
+  // Check if countdown has ended (August 2nd, 2025)
+  const isCountdownEnded = new Date() >= new Date('2025-08-02T00:00:00Z');
 
   if (!isVerified || !currentUser) {
     return <NameVerification onVerified={handleVerification} isLocked={isLocked} />;
