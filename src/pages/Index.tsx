@@ -194,10 +194,10 @@ const Index = () => {
   // Check if 1 minute has passed since locking (for testing)
   const isOneHourPassed = lockedAt && new Date() >= new Date(lockedAt.getTime() + 60 * 1000);
   
-  // Check if user should see results (either countdown ended or 1 hour passed and they've seen results)
-  const shouldShowResults = isCountdownEnded || (isOneHourPassed && hasSeenResults);
+  // Check if user should see results (either countdown ended or 1 minute passed)
+  const shouldShowResults = isCountdownEnded || isOneHourPassed;
 
-  console.log('🔍 Render state:', { currentUser, isVerified, isLoading, isLocked, lockedAt, isOneHourPassed, hasSeenResults });
+  console.log('🔍 Render state:', { currentUser, isVerified, isLoading, isLocked, lockedAt, isOneHourPassed, hasSeenResults, shouldShowResults });
   
   if (!isVerified || !currentUser) {
     console.log('📝 Showing name verification form');
