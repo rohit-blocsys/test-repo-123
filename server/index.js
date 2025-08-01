@@ -18,17 +18,42 @@ app.use(cors({
 app.use(express.json());
 
 // Connect to MongoDB
-connectDB().catch(console.error);
+let dbConnected = false;
+connectDB()
+  .then(() => {
+    dbConnected = true;
+    console.log('✅ MongoDB connected successfully');
+  })
+  .catch((error) => {
+    console.error('❌ MongoDB connection failed:', error);
+    dbConnected = false;
+  });
 
 // Routes
 app.get('/api/user-data/:name', async (req, res) => {
   try {
+    if (!dbConnected) {
+      console.log('⚠️ Database not connected, returning default data');
+      return res.json({
+        name: req.params.name,
+        flippedCards: {},
+        isLocked: false,
+        isVerified: false
+      });
+    }
+    
     const { name } = req.params;
+    console.log(`🔍 Fetching user data for: ${name}`);
     const userData = await getUserData(name);
+    console.log(`✅ User data found:`, userData);
     res.json(userData);
   } catch (error) {
-    console.error('Error fetching user data:', error);
-    res.status(500).json({ error: 'Failed to fetch user data' });
+    console.error('❌ Error fetching user data:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch user data',
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 
@@ -66,7 +91,20 @@ app.post('/api/reset/:name', async (req, res) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    database: dbConnected ? 'connected' : 'disconnected'
+  });
+});
+
+// Test endpoint
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    message: 'Server is working!',
+    timestamp: new Date().toISOString(),
+    database: dbConnected ? 'connected' : 'disconnected'
+  });
 });
 
 app.listen(PORT, () => {
