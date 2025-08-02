@@ -12,19 +12,12 @@ interface CountdownCardProps {
 const CountdownCard = ({ number, content, onFlip, isFlipped, isDisabled = false }: CountdownCardProps) => {
   const [showContent, setShowContent] = useState(false);
 
-  const targetDate = new Date('2025-08-02');
-  const currentDate = new Date();
-  const canReveal = currentDate >= targetDate;
-
   useEffect(() => {
-    if (isFlipped && canReveal) {
-      const timer = setTimeout(() => setShowContent(true), 300);
-      return () => clearTimeout(timer);
-    } else if (isFlipped && !canReveal) {
+    if (isFlipped) {
       const timer = setTimeout(() => setShowContent(true), 300);
       return () => clearTimeout(timer);
     }
-  }, [isFlipped, canReveal]);
+  }, [isFlipped]);
 
   const handleClick = () => {
     if (!isFlipped && !isDisabled) {
@@ -55,11 +48,7 @@ const CountdownCard = ({ number, content, onFlip, isFlipped, isDisabled = false 
           <div className="text-center text-primary-foreground">
             {showContent && (
               <div className="animate-fade-in">
-                {canReveal ? (
-                  <p className="text-sm font-medium leading-relaxed">{content}</p>
-                ) : (
-                  <div className="text-2xl animate-glow">❓</div>
-                )}
+                <p className="text-sm font-medium leading-relaxed">{content}</p>
               </div>
             )}
           </div>
