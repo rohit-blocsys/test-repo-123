@@ -61,7 +61,7 @@ const AdminPanel = ({ flippedCards, selectedStatements }: AdminPanelProps) => {
       <DialogTrigger asChild>
         <Button 
           variant="outline" 
-          className="fixed bottom-6 right-6 bg-gradient-love border-primary/30 text-primary-foreground hover:shadow-romantic"
+          className="fixed bottom-6 right-6 bg-gradient-love border-primary/30 text-white hover:shadow-romantic"
         >
           <Lock className="w-4 h-4 mr-2" />
           Answers

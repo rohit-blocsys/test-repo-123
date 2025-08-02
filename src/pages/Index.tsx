@@ -257,7 +257,11 @@ const Index = () => {
           <Button
             onClick={handleLock}
             disabled={isLocked || !hasMadeAllChoices}
-            className="bg-gradient-primary hover:opacity-90"
+            className={`${
+              isLocked || !hasMadeAllChoices 
+                ? 'bg-gray-300 text-gray-600 cursor-not-allowed' 
+                : 'bg-primary text-white hover:bg-primary/90'
+            } transition-colors duration-200`}
           >
             <Lock className="w-4 h-4 mr-2" />
             {isLocked ? 'Locked' : hasMadeAllChoices ? 'Lock Progress' : `Select ${4 - Object.keys(flippedCards).length} more choices`}
@@ -266,7 +270,7 @@ const Index = () => {
             onClick={handleRefresh}
             disabled={isLocked}
             variant="outline"
-            className="border-primary/30 hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="border-primary/30 hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed text-primary"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Refresh
