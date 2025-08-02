@@ -202,7 +202,12 @@ const Index = () => {
   const hasMadeAllChoices = Object.keys(flippedCards).length === 4;
   
   // Check if user should see results (only if they've made ALL choices AND either countdown ended, 1 minute passed, or they've already seen results AND choices are locked)
-  const shouldShowResults = hasMadeAllChoices && (isCountdownEnded || isOneHourPassed || (hasSeenResults && isLocked));
+  const shouldShowResults = hasMadeAllChoices && isLocked && (isCountdownEnded || isOneHourPassed || hasSeenResults);
+  
+  // Additional safety check: never show results if not all choices are made
+  if (!hasMadeAllChoices) {
+    console.log('🛡️ Safety check: Not showing results because not all choices are made');
+  }
 
   console.log('🔍 Render state:', { 
     currentUser, 
@@ -224,14 +229,15 @@ const Index = () => {
   }
 
   // Show data reveal after countdown ends or 1 hour passed
-  if (shouldShowResults) {
+  if (shouldShowResults && hasMadeAllChoices && Object.keys(flippedCards).length === 4) {
     console.log('🚨 SHOWING RESULTS - Debug info:', {
       hasMadeAllChoices,
       isCountdownEnded,
       isOneHourPassed,
       hasSeenResults,
       isLocked,
-      flippedCards: Object.keys(flippedCards)
+      flippedCards: Object.keys(flippedCards),
+      flippedCardsLength: Object.keys(flippedCards).length
     });
     return <DataReveal flippedCards={flippedCards} selectedStatements={selectedStatements} currentUser={currentUser} showConfetti={showConfetti} />;
   }
