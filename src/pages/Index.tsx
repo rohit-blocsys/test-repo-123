@@ -204,7 +204,19 @@ const Index = () => {
   // Check if user should see results (only if they've made ALL choices AND either countdown ended, 1 minute passed, or they've already seen results AND choices are locked)
   const shouldShowResults = hasMadeAllChoices && (isCountdownEnded || isOneHourPassed || (hasSeenResults && isLocked));
 
-  console.log('🔍 Render state:', { currentUser, isVerified, isLoading, isLocked, lockedAt, isOneHourPassed, hasSeenResults, hasMadeAllChoices, shouldShowResults });
+  console.log('🔍 Render state:', { 
+    currentUser, 
+    isVerified, 
+    isLoading, 
+    isLocked, 
+    lockedAt, 
+    isOneHourPassed, 
+    hasSeenResults, 
+    hasMadeAllChoices, 
+    shouldShowResults,
+    flippedCards: Object.keys(flippedCards),
+    flippedCardsLength: Object.keys(flippedCards).length
+  });
   
   if (!isVerified || !currentUser) {
     console.log('📝 Showing name verification form');
@@ -213,6 +225,14 @@ const Index = () => {
 
   // Show data reveal after countdown ends or 1 hour passed
   if (shouldShowResults) {
+    console.log('🚨 SHOWING RESULTS - Debug info:', {
+      hasMadeAllChoices,
+      isCountdownEnded,
+      isOneHourPassed,
+      hasSeenResults,
+      isLocked,
+      flippedCards: Object.keys(flippedCards)
+    });
     return <DataReveal flippedCards={flippedCards} selectedStatements={selectedStatements} currentUser={currentUser} showConfetti={showConfetti} />;
   }
 
