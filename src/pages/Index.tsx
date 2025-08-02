@@ -198,13 +198,13 @@ const Index = () => {
   // Check if 1 minute has passed since locking (for testing)
   const isOneHourPassed = lockedAt && new Date() >= new Date(lockedAt.getTime() + 60 * 1000);
   
-  // Check if user has made any choices
-  const hasMadeChoices = Object.keys(flippedCards).length > 0;
+  // Check if user has made choices for all 4 levels
+  const hasMadeAllChoices = Object.keys(flippedCards).length === 4;
   
-  // Check if user should see results (only if they've made choices AND either countdown ended, 1 minute passed, or they've already seen results)
-  const shouldShowResults = hasMadeChoices && (isCountdownEnded || isOneHourPassed || hasSeenResults);
+  // Check if user should see results (only if they've made ALL choices AND either countdown ended, 1 minute passed, or they've already seen results AND choices are locked)
+  const shouldShowResults = hasMadeAllChoices && (isCountdownEnded || isOneHourPassed || (hasSeenResults && isLocked));
 
-  console.log('🔍 Render state:', { currentUser, isVerified, isLoading, isLocked, lockedAt, isOneHourPassed, hasSeenResults, hasMadeChoices, shouldShowResults });
+  console.log('🔍 Render state:', { currentUser, isVerified, isLoading, isLocked, lockedAt, isOneHourPassed, hasSeenResults, hasMadeAllChoices, shouldShowResults });
   
   if (!isVerified || !currentUser) {
     console.log('📝 Showing name verification form');
