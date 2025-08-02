@@ -256,11 +256,11 @@ const Index = () => {
         <div className="flex justify-center gap-4 mb-8">
           <Button
             onClick={handleLock}
-            disabled={isLocked}
+            disabled={isLocked || !hasMadeAllChoices}
             className="bg-gradient-primary hover:opacity-90"
           >
             <Lock className="w-4 h-4 mr-2" />
-            {isLocked ? 'Locked' : 'Lock Progress'}
+            {isLocked ? 'Locked' : hasMadeAllChoices ? 'Lock Progress' : `Select ${4 - Object.keys(flippedCards).length} more choices`}
           </Button>
           <Button
             onClick={handleRefresh}
