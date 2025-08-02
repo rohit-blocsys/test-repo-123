@@ -18,6 +18,7 @@ const Index = () => {
   const [lockedAt, setLockedAt] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<string>('');
+  const [showConfetti, setShowConfetti] = useState(false);
 
   // Load state from database on component mount
   useEffect(() => {
@@ -33,6 +34,7 @@ const Index = () => {
           setIsLocked(userData.isLocked || false);
           setHasSeenResults(userData.hasSeenResults || false);
           setLockedAt(userData.lockedAt ? new Date(userData.lockedAt) : null);
+          setShowConfetti(false); // Don't show confetti when loading existing data
           // Only set isVerified from database if it's true, don't override if user just verified
           if (userData.isVerified) {
             console.log('✅ Setting isVerified to true from database');
@@ -103,6 +105,7 @@ const Index = () => {
     setCurrentUser(userName);
     setIsVerified(true);
     setIsLoading(false); // Ensure loading stops immediately
+    setShowConfetti(false); // Reset confetti state for new session
   };
 
   const handleLock = () => {
@@ -115,6 +118,7 @@ const Index = () => {
   const handleTimeUp = () => {
     console.log('⏰ 1 minute timer ended, user can now see results');
     setHasSeenResults(true);
+    setShowConfetti(true); // Trigger confetti when timer ends
   };
 
   const handleRefresh = async () => {
@@ -209,7 +213,7 @@ const Index = () => {
 
   // Show data reveal after countdown ends or 1 hour passed
   if (shouldShowResults) {
-    return <DataReveal flippedCards={flippedCards} selectedStatements={selectedStatements} currentUser={currentUser} />;
+    return <DataReveal flippedCards={flippedCards} selectedStatements={selectedStatements} currentUser={currentUser} showConfetti={showConfetti} />;
   }
 
   return (

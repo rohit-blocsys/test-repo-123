@@ -8,9 +8,10 @@ interface DataRevealProps {
   flippedCards: Record<string, number>;
   selectedStatements: Record<string, string>;
   currentUser: string;
+  showConfetti?: boolean;
 }
 
-const DataReveal = ({ flippedCards, selectedStatements, currentUser }: DataRevealProps) => {
+const DataReveal = ({ flippedCards, selectedStatements, currentUser, showConfetti = false }: DataRevealProps) => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -21,30 +22,32 @@ const DataReveal = ({ flippedCards, selectedStatements, currentUser }: DataRevea
         const data = await api.getUserData(currentUser);
         setUserData(data);
         
-        // Trigger celebration confetti when results are shown!
-        setTimeout(() => {
-          confetti({
-            particleCount: 150,
-            spread: 90,
-            origin: { y: 0.6 }
-          });
-          
-          // Additional bursts
+        // Only trigger confetti if showConfetti is true (timer just ended)
+        if (showConfetti) {
           setTimeout(() => {
             confetti({
-              particleCount: 75,
-              angle: 60,
-              spread: 55,
-              origin: { x: 0 }
+              particleCount: 150,
+              spread: 90,
+              origin: { y: 0.6 }
             });
-            confetti({
-              particleCount: 75,
-              angle: 120,
-              spread: 55,
-              origin: { x: 1 }
-            });
-          }, 300);
-        }, 500); // Small delay to let the component render first
+            
+            // Additional bursts
+            setTimeout(() => {
+              confetti({
+                particleCount: 75,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 }
+              });
+              confetti({
+                particleCount: 75,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 }
+              });
+            }, 300);
+          }, 500); // Small delay to let the component render first
+        }
         
       } catch (error) {
         console.error('Error loading user data for reveal:', error);
