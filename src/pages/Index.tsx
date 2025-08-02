@@ -202,7 +202,7 @@ const Index = () => {
   const hasMadeAllChoices = Object.keys(flippedCards).length === 4;
   
   // Check if user should see results (only if they've made ALL choices AND either countdown ended, 1 minute passed, or they've already seen results AND choices are locked)
-  const shouldShowResults = hasMadeAllChoices && isLocked && (isCountdownEnded || isOneHourPassed || hasSeenResults);
+  const shouldShowResults = hasMadeAllChoices && isLocked && (isCountdownEnded || isOneHourPassed || (hasSeenResults && isOneHourPassed));
   
   // Additional safety check: never show results if not all choices are made
   if (!hasMadeAllChoices) {
