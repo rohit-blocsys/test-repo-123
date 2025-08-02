@@ -1,5 +1,5 @@
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://six-month-surprise.onrender.com/api'
+  ? 'https://romantic-countdown-backend.onrender.com/api'
   : 'http://localhost:3001/api';
 
 export interface UserData {

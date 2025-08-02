@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://six-months-anniversary.onrender.com', 'https://six-month-surprise.onrender.com', 'https://romantic-countdown-backend.onrender.com']
+    ? ['https://six-months-anniversary.onrender.com', 'https://six-month-surprise.onrender.com']
     : ['http://localhost:8080', 'http://localhost:3000', 'http://localhost:5173']
 }));
 app.use(express.json());
